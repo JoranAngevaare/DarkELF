@@ -6,3 +6,8 @@ darkelf/__pycache__
 examples/.*
 examples/darkelf_tester.ipynb
 *.DS_Store
+
+__pycache__
+.eggs
+.hypothesis
+*egg*
