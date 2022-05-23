@@ -1,0 +1,9 @@
+numpy
+scipy
+pandas
+vegas
+gvar
+
+# # Optional, notebooks require
+# matplotlib-label-lines
+# seaborn

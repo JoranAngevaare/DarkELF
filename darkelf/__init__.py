@@ -1,3 +1,5 @@
+__version__ = '0.0.0'
+
 import numpy as np
 from numpy import linspace, sqrt, array, pi, cos, sin, dot, exp, sinh, log, log10, cosh, sinh
 from scipy.interpolate import interp1d, interp2d
