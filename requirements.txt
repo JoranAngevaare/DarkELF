@@ -3,6 +3,7 @@ scipy
 pandas
 vegas
 gvar
+PyYAML
 
 # # Optional, notebooks require
 # matplotlib-label-lines
