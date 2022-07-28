@@ -8,7 +8,9 @@ from scipy.special import erf, erfc
 import pandas as pd
 import sys, os, glob
 import yaml
+import logging
 
+logger = logging.getLogger('darkelf')
 
 class darkelf(object):
     def __init__(self, mX = 1e5, mMed = -1, vesckms = 500, v0kms = 220, vekms = 240, delta = 0.0, q0=0.0,
@@ -74,7 +76,7 @@ class darkelf(object):
             self.targetyaml = targetyaml
         configfilename=eps_data_dir+'/'+target+'/'+self.targetyaml+'.yaml'
         if (not os.path.exists(configfilename)):
-            print("Configuration file for "+target+" is absent: ", configfilename)
+            logger.debug("Configuration file for "+target+" is absent: ", configfilename)
         else:
             with open(configfilename) as file:
                 variable_list = yaml.load(file, Loader=yaml.FullLoader)
@@ -123,7 +125,7 @@ class darkelf(object):
         self.Zion_filename = Zion_filename
 
         # Default is to use tabulated dielectric functions, assuming they are available.
-        print(" .... Loading files for " + self.target)
+        logger.debug(" .... Loading files for " + self.target)
 
         # Load epsilon data in electron regime
         self.load_epsilon_grid(self.eps_data_dir,self.filename)
@@ -154,7 +156,7 @@ class darkelf(object):
             else:
                 self.qchar = 0
         else:
-            print('Check number of atoms in yaml file')
+            logger.debug('Check number of atoms in yaml file')
 
 
 
@@ -190,9 +192,9 @@ class darkelf(object):
         """
         Show dark matter parameters currently used in the class.
         """
-        print("mX = " + str(self.mX) + " eV")
-        print("mMed = " + str(self.mMed) + " eV")
-        print("delta = " + str(self.delta) + " eV")
+        logger.info("mX = " + str(self.mX) + " eV")
+        logger.info("mMed = " + str(self.mMed) + " eV")
+        logger.info("delta = " + str(self.delta) + " eV")
         return
 
 
@@ -322,7 +324,7 @@ class darkelf(object):
         elif(isinstance(v,float)):
             return self._fv_1d_scalar(v)
         else:
-            print("Warning! fv function given invalid quantity ")
+            logger.warning("Warning! fv function given invalid quantity ")
             return 0.0
 
     # vmin(omega, k) in units of c
@@ -355,7 +357,7 @@ class darkelf(object):
         elif(isinstance(vmini,float)):
             return self._etav_scalar(vmini)
         else:
-            print("Warning! etav function given invalid quantity ")
+            logger.warning("Warning! etav function given invalid quantity ")
             return 0.0
 
     # Minimum and maximum allowed q values (TOTAL momentum transfer), given omega (energy deposited) and other DM params

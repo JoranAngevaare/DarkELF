@@ -21,7 +21,7 @@ def load_Migdal_FAC(self,datadir):
     FAC_fname = datadir+self.target+'/'+self.target+'_Migdal_FAC.dat'
     if (not os.path.exists(FAC_fname)):
         self.ibe_available=False
-        print("Warning! Atomic Migdal calculation not present")
+        logger.warning("Warning! Atomic Migdal calculation not present")
     else:
         self.ibe_available=True
         with open(FAC_fname) as f:
@@ -115,7 +115,7 @@ def dPdomegadk(self,omega,k,En,method="grid",Zionkdependence=True):
         else:
           dPdomegadk[i]=(2.0*self.alphaEM*self.Zion**2*vN**2)/(3.0*np.pi**2*omega[i]**4)*k**2*self.elf(omega[i],k,method=method)
       else:
-        if(i==0): print("This function is not available for "+self.target)
+        if(i==0): logger.warning("This function is not available for "+self.target)
         dPdomegadk[i]=0.0
 
     if(scalar_input):
@@ -168,12 +168,12 @@ def dPdomega(self,omega,En,method="grid",kcut=0,Nshell=0,Zionkdependence=True):
           # perform integral in log-space, for better convergence
           dPdomega[i]=integrate.quad(lambda logk: 10**logk*np.log(10.)*self.dPdomegadk(omega[i],10**logk,En,method=method,Zionkdependence=Zionkdependence),1.0,np.log10(kcut),limit=100,full_output=1)[0]
         else:
-          if(i==0): print("This function is not available for "+self.target)
+          if(i==0): logger.warning("This function is not available for "+self.target)
           dPdomega[i]=0.0
 
     if method=="Ibe":
       if(self.ibe_available==False):
-        print("This function is not available for "+self.target)
+        logger.warning("This function is not available for "+self.target)
         return 0
       else:
         prefac=1.0/(2.0*pi)*En*2.0*self.me**2/(self.mN*1.0**2) # see (91) of Ibe et al
@@ -203,7 +203,7 @@ def _I(self,omega,method,kcut,Nshell,Zionkdependence):
     if(hasattr(self, "Zion") and self.electron_ELF_loaded):
         return self.dPdomega(omega,1.0,method=method,kcut=kcut,Nshell=Nshell,Zionkdependence=Zionkdependence)
     else:
-        print("This function is not available for "+self.target)
+        logger.warning("This function is not available for "+self.target)
         return 0.0
 
 
@@ -256,7 +256,7 @@ def _J(self,v,omega,approximation,Enth,sigma_n):
   elif approximation=="impulse":
 
     if(not hasattr(self, "ombar")):
-      print("No phonon frequency found for this material. Specify ombar in yaml file or use the free approximation.")
+      logger.warning("No phonon frequency found for this material. Specify ombar in yaml file or use the free approximation.")
       sys.exit()# abort evaluation
     else:
 
@@ -278,7 +278,7 @@ def _J(self,v,omega,approximation,Enth,sigma_n):
       return prefactor*prefactor_imp*integrate.quad(lambda q: integrant(q),qmin,qmax)[0]
 
   else:
-    print("unknown approximation flag, please use 'free' or 'impulse'.")
+    logger.warning("unknown approximation flag, please use 'free' or 'impulse'.")
     return 0.0
 
 
@@ -319,7 +319,7 @@ def dRdomega_migdal(self,omega,Enth=-1.0,sigma_n=1e-38,method="grid",approximati
       if(hasattr(self, "ombar")):
         Enth=4.0*self.ombar
       else:
-        print("No phonon frequency found for this material. Setting Enth=0.1 eV")
+        logger.warning("No phonon frequency found for this material. Setting Enth=0.1 eV")
         Enth=0.1
 
     for i in range(len(omega)):
@@ -335,7 +335,7 @@ def dRdomega_migdal(self,omega,Enth=-1.0,sigma_n=1e-38,method="grid",approximati
           else:
             dRdomega[i]=self.rhoX/(self.mN*self.mX)*self._I(omega[i],method=method,kcut=kcut,Nshell=Nshell,Zionkdependence=Zionkdependence)*vint*self.c0cms*self.yeartosec/self.eVtokg
       else:
-        if(i==0): print("This function is not available for "+self.target)
+        if(i==0): logger.warning("This function is not available for "+self.target)
         dRdomega[i]=0.0
 
     if(scalar_input):
