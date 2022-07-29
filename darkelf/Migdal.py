@@ -4,6 +4,8 @@ from scipy.interpolate import interp1d, interp2d
 from scipy.special import erfc, erf
 from scipy import integrate
 import sys, os, glob
+from darkelf  import logger
+
 
 ############################################################################################
 
@@ -280,6 +282,59 @@ def _J(self,v,omega,approximation,Enth,sigma_n):
   else:
     logger.warning("unknown approximation flag, please use 'free' or 'impulse'.")
     return 0.0
+
+
+def dRdomega_migdal_mixed(self,
+                          omega,
+                          method: str ="mixed",
+                          omega_switch: float = 60.,
+                          **kwargs):
+    """
+    Wrapper function for dRdomega_migdal. While the 'grid' method is most
+    appropriate, it has a limitation that the data is only valid up to
+    ~70 eV (see page 4 right page https://arxiv.org/pdf/2104.12786.pdf)
+
+    Therefore, this wrapper function splits the computation over the grid
+    and Lindhard methods, to use the grid method below 60 eV and Lindhard
+    above.
+
+    Inputs
+    ------
+    self:
+        darkelf object
+    omega:
+        electron excitation energy in [eV]
+    method: ["grid","Lindhard","Ibe", 'mixed']
+        use interpolated grid of epsilon, Lindhard analytic epsilon or the atomic calculation by Ibe et al 1707.07258.
+        if mixed is specified, use 'grid' below <omega_switch> and Lindhard above
+    omega_switch:
+        which energy to transition from grid to Linhard
+    kwargs:
+        any kwargs are passed on to the dRdomega_migdal method
+
+    returns
+    -------
+        differential rate for ionization from the Migdal effect, in 1/kg/yr/eV
+        array / scalar of shape omega
+    """
+    if method != 'mixed':
+        # okay, someone was lazy and just wants dRdomega_migdal
+        return self.dRdomega_migdal(omega, method=method, **kwargs)
+
+    scalar_input = np.isscalar(omega)
+    if scalar_input:
+        omega = np.array([omega])
+    below_switch = omega < omega_switch
+    part_a = np.array([])
+    part_b = np.array([])
+    if np.any(below_switch):
+        part_a = self.dRdomega_migdal(omega[below_switch], method='grid', **kwargs)
+    if np.any(~below_switch):
+        part_b = self.dRdomega_migdal(omega[~below_switch], method='lindhard', **kwargs)
+
+    results = np.concatenate([part_a, part_b])
+    return results[0] if scalar_input else results
+
 
 
 # Migdal rate
