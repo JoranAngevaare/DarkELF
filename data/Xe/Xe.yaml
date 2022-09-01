@@ -3,3 +3,9 @@ Enl_list : [35000.,5400.,4900.,1100.,930.,660.,200.,140.,61.,21.,9.8]
 alattice : 3.57 # obviously fake
 A : 131
 Z : 54
+Avec: [131.]
+atoms: ['Xe']
+# TODO
+cLAkms: 0. # sound speed is needed here to not break rest of code, but should update]
+lattice_spacing :  1. # temp needed here to not break rest of code, but should update
+omegap: 0.25 # eV placeholder https://journals.aps.org/prb/abstract/10.1103/PhysRevB.8.914
